@@ -4,17 +4,6 @@ apply plugin: 'release'
 task release(overwrite: true, dependsOn: commitNewVersion) << {
     // This is a good place to put an email to send out
 }
-commitNewVersion.dependsOn updateVersion
-updateVersion.dependsOn createReleaseTag
-createReleaseTag.dependsOn preTagCommit
-preTagCommit.dependsOn build
-preTagCommit.dependsOn buildWithArtifactory
-preTagCommit.dependsOn checkSnapshotDependencies
-checkSnapshotDependencies.dependsOn confirmReleaseVersion
-confirmReleaseVersion.dependsOn unSnapshotVersion
-unSnapshotVersion.dependsOn checkUpdateNeeded
-checkUpdateNeeded.dependsOn checkCommitNeeded
-checkCommitNeeded.dependsOn initScmPlugin
 
 [
     uploadIvyLocal: 'uploadLocal', 
@@ -30,6 +19,18 @@ checkCommitNeeded.dependsOn initScmPlugin
     }
 }
 task releaseArtifactory(dependsOn: [preTagCommit, uploadArtifactory])
+
+commitNewVersion.dependsOn updateVersion
+updateVersion.dependsOn createReleaseTag
+createReleaseTag.dependsOn preTagCommit
+preTagCommit.dependsOn build
+preTagCommit.dependsOn buildWithArtifactory
+preTagCommit.dependsOn checkSnapshotDependencies
+checkSnapshotDependencies.dependsOn confirmReleaseVersion
+confirmReleaseVersion.dependsOn unSnapshotVersion
+unSnapshotVersion.dependsOn checkUpdateNeeded
+checkUpdateNeeded.dependsOn checkCommitNeeded
+checkCommitNeeded.dependsOn initScmPlugin
 
 // Ensure upload happens before taggging but after all pre-checks
 createReleaseTag.dependsOn releaseArtifactory
