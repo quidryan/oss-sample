@@ -41,7 +41,6 @@ createReleaseTag.dependsOn uploadMavenCentral
             throw new GradleException('"release" task has to be run before uploading a release')
         }
     }
-}
 
 // Prevent plugin from asking for a version number interactively
 ext.'gradle.release.useAutomaticVersion' = "true"
