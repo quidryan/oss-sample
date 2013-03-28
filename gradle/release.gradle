@@ -38,6 +38,16 @@ createReleaseTag.dependsOn releaseArtifactory
 uploadMavenCentral.dependsOn preTagCommit
 createReleaseTag.dependsOn uploadMavenCentral
 
+def releaseTasks = [initScmPlugin, checkCommitNeeded, checkUpdateNeeded, unSnapshotVersion, confirmReleaseVersion, checkSnapshotDependencies,
+         preTagCommit, createReleaseTag, updateVersion, commitNewVersion]
+releaseTasks.each { releaseTask -> releaseTask << {
+    println "STATUS ${releaseTask.name}: ${project.status}"
+}}
+releaseTasks.inject(null) { acc, val -> 
+    println "Should make ${val?.name} depend on ${acc?.name}"
+    val
+}
+
 // Prevent plugin from asking for a version number interactively
 ext.'gradle.release.useAutomaticVersion' = "true"
 
