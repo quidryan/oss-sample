@@ -1,10 +1,11 @@
 apply plugin: 'release'
 
 // Ignore release plugin's task because it calls out via GradleBuild. This is a good place to put an email to send out
-task release(overwrite: true, dependsOn: commitNewVersion) << {
+//task release(overwrite: true, dependsOn: commitNewVersion) << {
     // This is a good place to put an email to send out
-}
+//}
 
+/*
 task forceStatusToCandidate(dependsOn: unSnapshotVersion) {
     onlyIf { 
         gradle.taskGraph.allTasks.each { println "TASKS: ${it.name}" }
@@ -17,6 +18,7 @@ task forceStatusToCandidate(dependsOn: unSnapshotVersion) {
 preTagCommit.dependsOn forceStatusToCandidate
 
 task releaseCandidate(dependsOn: [forceStatusToCandidate,release])
+*/
 
 //unSnapshotVersion << {
 //    project.status = version.contains('-SNAPSHOT')?:'snapshot'
@@ -35,6 +37,7 @@ task releaseCandidate(dependsOn: [forceStatusToCandidate,release])
         tasks = [ 'build', value ]
     }
 }
+/*
 task releaseArtifactory(dependsOn: [preTagCommit, uploadArtifactory])
 
 preTagCommit.dependsOn build
@@ -45,7 +48,7 @@ createReleaseTag.dependsOn releaseArtifactory
 
 uploadMavenCentral.dependsOn preTagCommit
 createReleaseTag.dependsOn uploadMavenCentral
-
+*/
 def releaseTasks = [initScmPlugin, checkCommitNeeded, checkUpdateNeeded, unSnapshotVersion, confirmReleaseVersion, checkSnapshotDependencies,
          preTagCommit, createReleaseTag, updateVersion, commitNewVersion]
 println "PRESTATUS: ${project.status}"
@@ -54,7 +57,7 @@ releaseTasks.each { releaseTask -> releaseTask << {
 }}
 releaseTasks.inject(null) { acc, val -> 
     if (acc!=null) {
-        val.dependsOn(acc)
+    //    val.dependsOn(acc)
     }
     val
 }
@@ -63,11 +66,11 @@ releaseTasks.inject(null) { acc, val ->
 ext.'gradle.release.useAutomaticVersion' = "true"
 
 release {
-    failOnCommitNeeded=true
-    failOnPublishNeeded=true
+    failOnCommitNeeded=false
+    failOnPublishNeeded=false
     failOnSnapshotDependencies=true
-    failOnUnversionedFiles=true
-    failOnUpdateNeeded=true
+    failOnUnversionedFiles=false
+    failOnUpdateNeeded=false
     includeProjectNameInTag=true
     revertOnFail=true
     requireBranch = null
