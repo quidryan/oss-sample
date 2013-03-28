@@ -14,10 +14,9 @@ signing {
  */
 task uploadMavenCentral(type:Upload, dependsOn: signArchives) {
     configuration = configurations.archives
-    onlyIf { println "Status: ${project.status}"; ['release', 'snapshot'].contains(project.status) }
-    doFirst {
+    onlyIf { ['release', 'snapshot'].contains(project.status) }
         repositories.mavenDeployer {
-            beforeDeployment { org.gradle.api.artifacts.maven.MavenDeployment deployment -> signing.signPom(deployment) }
+            beforeDeployment { signing.signPom(it) }
 
             // To test deployment locally, use the following instead of oss.sonatype.org
             repository(url: "file://localhost/${rootProject.rootDir}/repo")
@@ -26,12 +25,12 @@ task uploadMavenCentral(type:Upload, dependsOn: signArchives) {
             repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
                 authentication(userName: rootProject.sonatypeUsername, password: rootProject.sonatypePassword)
             }
-            */
 
                 snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
                     authentication(userName: rootProject.sonatypeUsername, password: rootProject.sonatypePassword)
                 }
 
+            */
                 // Prevent datastamp from being appending to artifacts during deployment
                 uniqueVersion = false
               
@@ -65,6 +64,5 @@ task uploadMavenCentral(type:Upload, dependsOn: signArchives) {
                     }
                 }
         }
-    }
 }
 

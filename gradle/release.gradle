@@ -37,13 +37,6 @@ createReleaseTag.dependsOn releaseArtifactory
 
 uploadMavenCentral.dependsOn preTagCommit
 createReleaseTag.dependsOn uploadMavenCentral
-    gradle.taskGraph.whenReady { taskGraph ->
-        def mcStatuses = ['release', 'snapshot']
-        // TBD Ensure status!=snapshot during release, but it has to be after unSnapshotVersion
-        if ( !mcStatuses.contains(rootProject.status) && taskGraph.hasTask(':uploadMavenCentral') ) {
-            throw new GradleException('Maven only supports "release" or "snapshot" as statuses')
-        }
-    }
 
 // Prevent plugin from asking for a version number interactively
 ext.'gradle.release.useAutomaticVersion' = "true"
