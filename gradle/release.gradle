@@ -6,7 +6,7 @@ task release(overwrite: true, dependsOn: commitNewVersion) << {
 }
 
 task forceStatusToCandidate(dependsOn: unSnapshotVersion) {
-    onlyIf { gradle.taskGraph.hasTask(':releaseCandidate') }
+    onlyIf { gradle.taskGraph.hasTask('releaseCandidate') }
     doFirst {
         status = 'candidate'
     }
