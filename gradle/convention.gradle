@@ -1,4 +1,3 @@
-
 def preferredStatus = status // Java Plugin will overwrite
 apply plugin: 'java' // Plugin as major conventions
 
