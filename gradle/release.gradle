@@ -38,8 +38,12 @@ createReleaseTag.dependsOn releaseArtifactory
 uploadMavenCentral.dependsOn preTagCommit
 createReleaseTag.dependsOn uploadMavenCentral
     gradle.taskGraph.whenReady { taskGraph ->
-        if ( rootProject.status == 'release' && !taskGraph.hasTask(':release') ) {
-            throw new GradleException('"release" task has to be run before uploading a release')
+        if ( rootProject.status != 'snapshot' && !taskGraph.hasTask(':release') ) {
+            throw new GradleException('"release" task has to be run before uploading an immutable release')
+        }
+        def mcStatuses = ['release', 'snapshot']
+        if ( !mcStatuses.contains(rootProject.status) && taskGraph.hasTask(':uploadMavenCentral') ) {
+            throw new GradleException('Maven only supports "release" or "snapshot" as statuses')
         }
     }
 
