@@ -6,7 +6,10 @@ task release(overwrite: true, dependsOn: commitNewVersion) << {
 }
 
 task forceStatusToCandidate(dependsOn: unSnapshotVersion) {
-    onlyIf { gradle.taskGraph.hasTask('releaseCandidate') }
+    onlyIf { 
+        gradle.taskGraph.allTasks.each { println "TASKS: ${it.name}" }
+        return gradle.taskGraph.hasTask('releaseCandidate')
+        }
     doFirst {
         project.status = 'candidate'
     }
@@ -15,9 +18,9 @@ preTagCommit.dependsOn forceStatusToCandidate
 
 task releaseCandidate(dependsOn: [forceStatusToCandidate,release])
 
-unSnapshotVersion << {
-    status = version.contains('-SNAPSHOT')?:'snapshot'
-}
+//unSnapshotVersion << {
+//    project.status = version.contains('-SNAPSHOT')?:'snapshot'
+//}
 
 [
     uploadIvyLocal: 'uploadLocal', 
@@ -68,4 +71,10 @@ release {
     includeProjectNameInTag=true
     revertOnFail=true
     requireBranch = null
+}
+
+gradle.afterProject { project, projectState ->
+    if (projectState.failure) {
+        // TBD Rollback to head
+    }
 }
