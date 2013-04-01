@@ -44,7 +44,7 @@ task releaseArtifactory(dependsOn: [preTagCommit, uploadArtifactory])
 
 preTagCommit << {
     if (project.status != 'release') {
-        throw new GradleException('Project has to be release status releasing')
+        throw new GradleException('Project has to be release status when releasing')
     }
 }
 
@@ -78,4 +78,8 @@ release {
     includeProjectNameInTag=true
     revertOnFail=true
     requireBranch = null
+}
+
+gradle.taskGraph.afterTask { task ->
+    println "STATUS: ${project.status} at ${task.name}"
 }
