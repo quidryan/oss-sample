@@ -37,30 +37,37 @@ task releaseCandidate(dependsOn: [forceStatusToCandidate,release])
         tasks = [ 'build', value ]
     }
 }
-/*
+
 task releaseArtifactory(dependsOn: [preTagCommit, uploadArtifactory])
 
-preTagCommit.dependsOn build
+// TODO Fix ordering so that build is after preTagCommit, since we want the release to capture the SHA1 that it can be built at
+
+// No promise that it'll run after checkSnapshotDependencies
 preTagCommit.dependsOn buildWithArtifactory
 
 // Ensure upload happens before taggging but after all pre-checks
 createReleaseTag.dependsOn releaseArtifactory
 
-uploadMavenCentral.dependsOn preTagCommit
+//uploadMavenCentral.dependsOn preTagCommit
 createReleaseTag.dependsOn uploadMavenCentral
-*/
+
 def releaseTasks = [initScmPlugin, checkCommitNeeded, checkUpdateNeeded, unSnapshotVersion, confirmReleaseVersion, checkSnapshotDependencies,
          preTagCommit, createReleaseTag, updateVersion, commitNewVersion]
 println "PRESTATUS: ${project.status}"
 releaseTasks.each { releaseTask -> releaseTask << {
     println "STATUS ${releaseTask.name}: ${project.status}"
 }}
+/*
 releaseTasks.inject(null) { acc, val -> 
     if (acc!=null) {
     //    val.dependsOn(acc)
     }
     val
 }
+*/
+
+// TODO Check that if the release target is used, then the build has to be after unSnapshotVersion
+// TODO Check that if the release target is used, then the uploads have to be after preTagCommit
 
 // Prevent plugin from asking for a version number interactively
 ext.'gradle.release.useAutomaticVersion' = "true"
@@ -76,8 +83,10 @@ release {
     requireBranch = null
 }
 
+/*
 gradle.afterProject { project, projectState ->
     if (projectState.failure) {
         // TBD Rollback to head
     }
 }
+*/
