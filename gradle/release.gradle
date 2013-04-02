@@ -15,23 +15,10 @@ apply plugin: 'release'
     }
 }
 
-// Marker
-/*
-artifactoryPublish.dependsOn(calculateStatus)
-task releaseArtifactory(dependsOn: artifactoryPublish)
-task calculateStatus {
-    onlyIf { gradle.taskGraph.hasTask(releaseArtifactory) || gradle.taskGraph.hasTask(preTagCommit) }
-
-    project.status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
-
-}
-*/
-
 // Marker task for following code to key in on
 task releaseCandidate(dependsOn: release)
 
-// Build could do all sorts of things to the status, so adding logic to run after build
-preTagCommit << {
+confirmReleaseVersion << {
     project.status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
 }
 
