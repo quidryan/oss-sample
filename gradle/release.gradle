@@ -19,14 +19,14 @@ task releaseCandidate(dependsOn: release)
 
 // Build could do all sorts of things to the status, so adding logic to run after build
 preTagCommit << {
-    status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
+    project.status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
 }
 
 // Ensure our versions look like the project status before publishing
 task verifyStatus << {
     def hasSnapshot = version.contains('-SNAPSHOT')
     if (project.status == 'snapshot' && !hasSnapshot) {
-        throw new GradleException('Version (${version}) needs -SNAPSHOT if publishing snapshot')
+        throw new GradleException("Version (${version}) needs -SNAPSHOT if publishing snapshot")
     }
 }
 uploadArtifactory.dependsOn(verifyStatus)
