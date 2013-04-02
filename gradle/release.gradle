@@ -20,6 +20,8 @@ task releaseCandidate(dependsOn: release)
 task releaseSnapshot(dependsOn: [uploadArtifactory, uploadMavenCentral])
 
 confirmReleaseVersion << {
+    println gradle.taskGraph.allTasks
+    println "CANDIDATE: ${gradle.taskGraph.hasTask(releaseCandidate)}"
     project.status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
 }
 
@@ -61,6 +63,6 @@ release {
 }
 
 gradle.taskGraph.afterTask { task ->
-    println "STATUS(${task.name}): ${project.status}"
+    //println "STATUS(${task.name}): ${project.status}"
 }
 

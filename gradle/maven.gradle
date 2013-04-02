@@ -14,7 +14,7 @@ signing {
  */
 task uploadMavenCentral(type:Upload, dependsOn: signArchives) {
     configuration = configurations.archives
-    onlyIf { println "Status in only if ${project.status}"; ['release', 'snapshot'].contains(project.status) }
+    onlyIf { ['release', 'snapshot'].contains(project.status) }
         repositories.mavenDeployer {
             beforeDeployment { signing.signPom(it) }
 
