@@ -1,29 +1,5 @@
 apply plugin: 'release'
 
-// Ignore release plugin's task because it calls out via GradleBuild. This is a good place to put an email to send out
-//task release(overwrite: true, dependsOn: commitNewVersion) << {
-    // This is a good place to put an email to send out
-//}
-
-/*
-task forceStatusToCandidate(dependsOn: unSnapshotVersion) {
-    onlyIf { 
-        gradle.taskGraph.allTasks.each { println "TASKS: ${it.name}" }
-        return gradle.taskGraph.hasTask('releaseCandidate')
-        }
-    doFirst {
-        project.status = 'candidate'
-    }
-}
-preTagCommit.dependsOn forceStatusToCandidate
-
-task releaseCandidate(dependsOn: [forceStatusToCandidate,release])
-*/
-
-//unSnapshotVersion << {
-//    project.status = version.contains('-SNAPSHOT')?:'snapshot'
-//}
-
 [
     uploadIvyLocal: 'uploadLocal', 
     uploadArtifactory: 'artifactoryPublish', // Call out to compile against internal repository
@@ -38,33 +14,37 @@ task releaseCandidate(dependsOn: [forceStatusToCandidate,release])
     }
 }
 
-task releaseArtifactory(dependsOn: [preTagCommit, uploadArtifactory])
+// Marker task for following code to key in on
+task releaseCandidate(dependsOn: release)
 
-// TODO Fix ordering so that build is after preTagCommit, since we want the release to capture the SHA1 that it can be built at
-
-confirmReleaseVersion << {
-    if (project.status != 'release') {
-        throw new GradleException('Project has to be release status when releasing')
-    }
+// Build could do all sorts of things to the status, so adding logic to run after build
+preTagCommit << {
+    status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
 }
 
+// Ensure our versions look like the project status before publishing
+task verifyStatus << {
+    def hasSnapshot = version.contains('-SNAPSHOT')
+    if (project.status == 'snapshot' && !hasSnapshot) {
+        throw new GradleException('Version (${version}) needs -SNAPSHOT if publishing snapshot')
+    }
+}
+uploadArtifactory.dependsOn(verifyStatus)
+uploadMavenCentral.dependsOn(verifyStatus)
+
 // Ensure upload happens before taggging but after all pre-checks
-createReleaseTag.dependsOn uploadArtifactory
-createReleaseTag.dependsOn uploadMavenCentral
+createReleaseTag.dependsOn [uploadArtifactory, uploadMavenCentral]
 
 gradle.taskGraph.whenReady { taskGraph ->
     def hasRelease = taskGraph.hasTask('release')
     def indexOf = { return taskGraph.allTasks.indexOf(it) }
 
-    if (hasRelease && indexOf(build) > indexOf(unSnapshotVersion) ) {
-        throw new GradleException('build target has to be after unSnapshotVersion')
-    }
-
-    if (hasRelease && indexOf(uploadMavenCentral) > indexOf(preTagCommit) ) {
-        throw new GradleException('build target has to be after unSnapshotVersion')
+    if (hasRelease) {
+        assert indexOf(build) < indexOf(unSnapshotVersion), 'build target has to be after unSnapshotVersion'
+        assert indexOf(uploadMavenCentral) < indexOf(preTagCommit), 'preTagCommit has to be after uploadMavenCentral'
+        assert indexOf(uploadArtifactory) < indexOf(preTagCommit), 'preTagCommit has to be after uploadArtifactory'
     }
 }
-
 
 // Prevent plugin from asking for a version number interactively
 ext.'gradle.release.useAutomaticVersion' = "true"
@@ -76,7 +56,7 @@ release {
     failOnUnversionedFiles=false
     failOnUpdateNeeded=false
     includeProjectNameInTag=true
-    revertOnFail=true
+//    revertOnFail=true
     requireBranch = null
 }
 

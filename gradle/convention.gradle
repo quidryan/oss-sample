@@ -1,10 +1,9 @@
-def preferredStatus = status // Java Plugin will overwrite
-apply plugin: 'java' // Plugin as major conventions
+apply plugin: 'java' // Plugin as major conventions, overwrites status
 
 sourceCompatibility = 1.6
 
 // GRADLE-2087 workaround, perform after java plugin
-status = version.contains('-SNAPSHOT')?'snapshot':preferredStatus
+status = 'snapshot' // Force status to snapshot for anything outside the release plugin
 
 // Indenting to align with multi-project branch
     task sourcesJar(type: Jar, dependsOn:classes) {
