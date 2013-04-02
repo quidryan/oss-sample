@@ -8,7 +8,7 @@ apply plugin: 'release'
     // Call out to compile against internal repository
     task "${key}"(type: GradleBuild) {
         startParameter = project.gradle.startParameter.newInstance()
-        startParameter.projectProperties ['status', project.status]
+        startParameter.projectProperties = [status: project.status]
         startParameter.addInitScript( file('gradle/netflix-oss.gradle') )
         startParameter.getExcludedTaskNames().add('check')
         tasks = [ 'build', value ]
@@ -29,7 +29,7 @@ confirmReleaseVersion << {
     println gradle.taskGraph.allTasks
     println "CANDIDATE: ${gradle.taskGraph.hasTask(releaseCandidate)}"
     println "STATUS: ${project.status}"
-    project.status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
+    //project.status = project.status!='gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
 }
 
 // Ensure our versions look like the project status before publishing
