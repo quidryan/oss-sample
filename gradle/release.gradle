@@ -70,6 +70,6 @@ release {
 }
 
 gradle.taskGraph.afterTask { task ->
-    //println "STATUS(${task.name}): ${project.status}"
+    println "STATUS(${task.name}): ${project.status}"
 }
 
