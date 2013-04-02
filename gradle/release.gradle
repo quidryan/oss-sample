@@ -1,14 +1,12 @@
 apply plugin: 'release'
 
-[
-    uploadIvyLocal: 'uploadLocal', 
-    uploadArtifactory: 'artifactoryPublish', // Call out to compile against internal repository
-    buildWithArtifactory: 'build' // Build against internal repository
-].each { key, value ->
+[ uploadIvyLocal: 'uploadLocal', uploadArtifactory: 'artifactoryPublish', buildWithArtifactory: 'build' ].each { key, value ->
     // Call out to compile against internal repository
     task "${key}"(type: GradleBuild) {
         startParameter = project.gradle.startParameter.newInstance()
-        startParameter.projectProperties = [status: project.status]
+        doFirst {
+            startParameter.projectProperties = [status: project.status]
+        }
         startParameter.addInitScript( file('gradle/netflix-oss.gradle') )
         startParameter.getExcludedTaskNames().add('check')
         tasks = [ 'build', value ]
@@ -25,13 +23,6 @@ release.dependsOn(forceCandidate)
 
 task releaseSnapshot(dependsOn: [uploadArtifactory, uploadMavenCentral])
 
-confirmReleaseVersion << {
-    println gradle.taskGraph.allTasks
-    println "CANDIDATE: ${gradle.taskGraph.hasTask(releaseCandidate)}"
-    println "STATUS: ${project.status}"
-    //project.status = project.status!='gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
-}
-
 // Ensure our versions look like the project status before publishing
 task verifyStatus << {
     def hasSnapshot = version.contains('-SNAPSHOT')
@@ -46,7 +37,7 @@ uploadMavenCentral.dependsOn(verifyStatus)
 createReleaseTag.dependsOn([uploadArtifactory, uploadMavenCentral])
 
 gradle.taskGraph.whenReady { taskGraph ->
-    def hasRelease = taskGraph.hasTask('release')
+    def hasRelease = taskGraph.hasTask('commitNewVersion')
     def indexOf = { return taskGraph.allTasks.indexOf(it) }
 
     if (hasRelease) {
@@ -68,11 +59,3 @@ release {
     includeProjectNameInTag=true
     git.requireBranch = null
 }
-
-gradle.taskGraph.afterTask { task ->
-    println ">STATUS(${task.name}): ${project.status}"
-}
-gradle.taskGraph.beforeTask { task ->
-    println "<STATUS(${task.name}): ${project.status}"
-}
-
