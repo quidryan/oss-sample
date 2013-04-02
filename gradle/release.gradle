@@ -33,7 +33,7 @@ uploadArtifactory.dependsOn(verifyStatus)
 uploadMavenCentral.dependsOn(verifyStatus)
 
 // Ensure upload happens before taggging but after all pre-checks
-createReleaseTag.dependsOn [uploadArtifactory, uploadMavenCentral]
+createReleaseTag.dependsOn([uploadArtifactory, uploadMavenCentral])
 
 gradle.taskGraph.whenReady { taskGraph ->
     def hasRelease = taskGraph.hasTask('release')
