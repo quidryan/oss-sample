@@ -14,9 +14,7 @@ allprojects {
     repositories { mavenRepo url: 'http://jcenter.bintray.com' }
 }
 
-println "TOP STATUS 3: ${project.status}"
 apply from: file('gradle/convention.gradle')
-println "TOP STATUS 4: ${project.status}"
 apply from: file('gradle/maven.gradle')
 apply from: file('gradle/check.gradle')
 apply from: file('gradle/license.gradle')

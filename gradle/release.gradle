@@ -56,5 +56,5 @@ release {
     failOnUnversionedFiles=false
     failOnUpdateNeeded=false
     includeProjectNameInTag=true
-    requireBranch = null
+    git.requireBranch = null
 }
