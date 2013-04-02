@@ -58,3 +58,8 @@ release {
     includeProjectNameInTag=true
     git.requireBranch = null
 }
+
+gradle.taskGraph.afterTask { task ->
+    println "STATUS(${task.name}): ${project.status}"
+}
+
