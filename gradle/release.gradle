@@ -42,7 +42,7 @@ task releaseArtifactory(dependsOn: [preTagCommit, uploadArtifactory])
 
 // TODO Fix ordering so that build is after preTagCommit, since we want the release to capture the SHA1 that it can be built at
 
-preTagCommit << {
+confirmReleaseVersion << {
     if (project.status != 'release') {
         throw new GradleException('Project has to be release status when releasing')
     }
