@@ -8,11 +8,24 @@ apply plugin: 'release'
     // Call out to compile against internal repository
     task "${key}"(type: GradleBuild) {
         startParameter = project.gradle.startParameter.newInstance()
+        startParameter.projectProperties.put('status', project.status)
         startParameter.addInitScript( file('gradle/netflix-oss.gradle') )
         startParameter.getExcludedTaskNames().add('check')
         tasks = [ 'build', value ]
     }
 }
+
+// Marker
+/*
+artifactoryPublish.dependsOn(calculateStatus)
+task releaseArtifactory(dependsOn: artifactoryPublish)
+task calculateStatus {
+    onlyIf { gradle.taskGraph.hasTask(releaseArtifactory) || gradle.taskGraph.hasTask(preTagCommit) }
+
+    project.status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
+
+}
+*/
 
 // Marker task for following code to key in on
 task releaseCandidate(dependsOn: release)
