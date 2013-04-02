@@ -17,6 +17,7 @@ apply plugin: 'release'
 
 // Marker task for following code to key in on
 task releaseCandidate(dependsOn: release)
+task releaseSnapshot(dependsOn: [uploadArtifactory, uploadMavenCentral])
 
 confirmReleaseVersion << {
     project.status = gradle.taskGraph.hasTask(releaseCandidate)?'candidate':'release'
