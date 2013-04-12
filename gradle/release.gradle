@@ -19,7 +19,11 @@ task forceCandidate {
     onlyIf { gradle.taskGraph.hasTask(releaseCandidate) }
     doFirst { project.status = 'candidate' }
 }
-release.dependsOn(forceCandidate)
+task forceRelease {
+    onlyIf { !gradle.taskGraph.hasTask(releaseCandidate) }
+    doFirst { project.status = 'release' }
+}
+release.dependsOn([forceCandidate, forceRelease])
 
 task releaseSnapshot(dependsOn: [uploadArtifactory, uploadMavenCentral])
 
