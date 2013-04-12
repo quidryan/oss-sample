@@ -19,8 +19,8 @@ task uploadMavenCentral(type:Upload, dependsOn: signArchives) {
             beforeDeployment { signing.signPom(it) }
 
             // To test deployment locally, use the following instead of oss.sonatype.org
-            //repository(url: "file://localhost/${rootProject.rootDir}/repo")
-
+            repository(url: "file://localhost/${rootProject.rootDir}/repo")
+/*
             def sonatypeUsername = rootProject.hasProperty('sonatypeUsername')?rootProject.sonatypeUsername:''
             def sonatypePassword = rootProject.hasProperty('sonatypePassword')?rootProject.sonatypePassword:''
 
@@ -32,6 +32,7 @@ task uploadMavenCentral(type:Upload, dependsOn: signArchives) {
                     authentication(userName: sonatypeUsername, password: sonatypePassword)
                 }
 
+  */
                 // Prevent datastamp from being appending to artifacts during deployment
                 uniqueVersion = false
               
